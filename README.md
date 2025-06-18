@@ -1,33 +1,13 @@
-# EvrakNET
+# Evrak Takip Sistemi
 
-Modern, simple, and responsive Document Tracking System.
+Bu proje, kullanıcıların evraklarını kolayca yükleyip durumlarını takip edebileceği basit bir Evrak Takip Sistemi uygulamasıdır. Proje, temel olarak HTML, CSS ve JavaScript kullanılarak geliştirilmiştir. (İsteğe göre Node.js backend eklenebilir.)
 
-## Tech Stack
-- HTML, CSS, JavaScript (vanilla)
-- Node.js (serverless, Vercel API routes)
-- Hosted on Vercel
+## 📌 Proje Amacı
 
-## Color Palette
-- Blue: #007BFF
-- Navy: #003366
-- White background
+Kurum içi veya bireysel kullanıcıların evraklarının takibini dijital ortamda yapmasını kolaylaştırmak amacıyla tasarlanmıştır. Evrakların durumu, tarihi ve açıklamaları kullanıcı arayüzünden görülebilir.
 
-## Features
-- User authentication (mock, localStorage token)
-- Admin privilege check
-- Dashboard after login
-- Document management (JSON mock data)
-- Search and filter by document number, date range, and status
-- Document detail view with status update and log history
-- Responsive, clean, corporate UI (Google Fonts: Inter or Roboto)
-- Pages: Login, Dashboard, Document Detail, Status Update Modal
-- Logo: "EvrakNET" in modern sans-serif font on all pages
+## 🛠 Kullanılan Teknolojiler
 
-## Setup & Deployment
-1. Clone the repo
-2. Deploy to Vercel (supports Vercel's serverless API routes)
-3. No build step required for vanilla JS/CSS/HTML
-
----
-
-This project is designed for clarity, modularity, and future JWT integration. 
+- **HTML**: Sayfa yapısını oluşturmak için kullanıldı.
+- **CSS**: Sayfa tasarımı ve stillendirme işlemleri için kullanıldı.
+- **JavaScript**: Sayfa içi etkileşimleri ve evrakların takip sürecini dinamikleştirmek için kullanıldı.
