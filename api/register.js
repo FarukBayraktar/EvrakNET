@@ -1,13 +1,23 @@
-import dbConnect from '../lib/dbConnect.js'
-import User from '../models/User.js'
+import clientPromise from './_db'
 
 export default async function handler(req, res) {
-  await dbConnect()
-
+  if (req.method !== 'POST') {
+    res.status(405).json({ message: 'Method not allowed' })
+    return
+  }
   const { email, password } = req.body
-  const existing = await User.findOne({ email })
-  if (existing) return res.status(400).json({ message: 'Kullanıcı zaten kayıtlı' })
-
-  const user = await User.create({ email, password, isAdmin: false })
-  res.status(201).json({ message: 'Kayıt başarılı', user })
-}
+  if (!email || !password) {
+    res.status(400).json({ message: 'Email ve şifre zorunlu' })
+    return
+  }
+  const client = await clientPromise
+  const db = client.db('evraknet')
+  const users = db.collection('users')
+  const existing = await users.findOne({ email })
+  if (existing) {
+    res.status(400).json({ message: 'Bu email ile kayıtlı kullanıcı var' })
+    return
+  }
+  await users.insertOne({ email, password })
+  res.status(200).json({ message: 'Kayıt başarılı' })
+} 

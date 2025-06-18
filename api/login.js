@@ -1,18 +1,24 @@
-import dbConnect from '../lib/dbConnect.js'
-import User from '../models/User.js'
+import clientPromise from './_db'
 
 export default async function handler(req, res) {
-  await dbConnect()
-
-  const { email, password } = req.body
-
-  const user = await User.findOne({ email })
-  if (!user || user.password !== password) {
-    return res.status(401).json({ message: 'Email veya şifre hatalı' })
+  if (req.method !== 'POST') {
+    res.status(405).json({ message: 'Method not allowed' })
+    return
   }
-
-  res.status(200).json({
-    token: 'fake-token', // Gerçek uygulamada JWT eklenir
-    isAdmin: user.isAdmin
-  })
-}
+  const { email, password } = req.body
+  if (!email || !password) {
+    res.status(400).json({ message: 'Email ve şifre zorunlu' })
+    return
+  }
+  const client = await clientPromise
+  const db = client.db('evraknet')
+  const users = db.collection('users')
+  const user = await users.findOne({ email, password })
+  if (!user) {
+    res.status(401).json({ message: 'Geçersiz email veya şifre' })
+    return
+  }
+  const isAdmin = email === 'admin@evraknet.com'
+  const token = 'mock-token-' + Math.random().toString(36).substr(2)
+  res.status(200).json({ token, isAdmin })
+} 
