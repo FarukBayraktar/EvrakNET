@@ -1,0 +1,13 @@
+{
+  "name": "evraknet",
+  "version": "1.0.0",
+  "description": "Modern, simple, and responsive Document Tracking System.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel start"
+  },
+  "keywords": ["evrak", "document", "tracking", "vercel", "serverless"],
+  "author": "",
+  "license": "MIT"
+} 

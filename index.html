@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvrakNET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">EvrakNET</div>
+  </header>
+  <main id="main-content">
+    <section id="login-section">
+      <form id="login-form">
+        <h2>Giriş Yap</h2>
+        <input type="email" id="email" placeholder="Email" required autocomplete="username">
+        <input type="password" id="password" placeholder="Şifre" required autocomplete="current-password">
+        <button type="submit">Giriş</button>
+        <div id="login-error"></div>
+        <div style="text-align:center;margin-top:1em;">
+          <a href="#" id="open-register">Hesabın yok mu? Kayıt Ol</a>
+        </div>
+      </form>
+    </section>
+    <section id="register-section" style="display:none;">
+      <form id="register-form">
+        <h2>Kayıt Ol</h2>
+        <input type="email" id="reg-email" placeholder="Email" required autocomplete="username">
+        <input type="password" id="reg-password" placeholder="Şifre" required autocomplete="new-password">
+        <input type="password" id="reg-password-repeat" placeholder="Şifre Tekrar" required autocomplete="new-password">
+        <button type="submit">Kayıt Ol</button>
+        <div id="register-error"></div>
+        <div style="text-align:center;margin-top:1em;">
+          <a href="#" id="back-to-login">Girişe Dön</a>
+        </div>
+      </form>
+    </section>
+    <section id="dashboard-section" style="display:none;"></section>
+    <section id="detail-modal" class="modal" style="display:none;"></section>
+    <section id="status-modal" class="modal" style="display:none;"></section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html> 
