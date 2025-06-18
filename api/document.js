@@ -1,19 +1,10 @@
-import fs from 'fs'
-import path from 'path'
+import dbConnect from '../lib/dbConnect.js'
 
-const dataPath = path.join(process.cwd(), 'api', 'mock-documents.json')
+export default async function handler(req, res) {
+  await dbConnect()
 
-export default function handler(req, res) {
-  if (req.method !== 'GET') {
-    res.status(405).json({ error: 'Method not allowed' })
-    return
-  }
   const { evrakNo } = req.query
-  const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'))
-  const doc = data.find(d => d.evrakNo === evrakNo)
-  if (!doc) {
-    res.status(404).json({ error: 'Document not found' })
-    return
-  }
+  const doc = await Document.findOne({ evrakNo })
+  if (!doc) return res.status(404).json({ message: 'Evrak bulunamadı' })
   res.status(200).json(doc)
-} 
+}
