@@ -127,7 +127,7 @@ function renderDashboard() {
   const addBtn = document.createElement('button')
   addBtn.textContent = 'Evrak Ekle'
   addBtn.className = 'btn btn-add'
-  addBtn.onclick = openAddModal
+  addBtn.onclick = () => openAddEditModal()
   const logoutBtn = document.createElement('button')
   logoutBtn.textContent = 'Çıkış Yap'
   logoutBtn.className = 'btn'
@@ -136,7 +136,7 @@ function renderDashboard() {
   dashboardSection.appendChild(topBar)
   const table = document.createElement('table')
   table.className = 'dashboard-table'
-  table.innerHTML = `<thead><tr><th>Evrak No</th><th>Başlık</th><th>Birim</th><th>Durum</th><th>Tarih</th><th></th><th></th></tr></thead><tbody></tbody>`
+  table.innerHTML = `<thead><tr><th>Evrak No</th><th>Başlık</th><th>Birim</th><th>Durum</th><th>Tarih</th><th>Drive</th><th></th><th></th><th></th></tr></thead><tbody></tbody>`
   dashboardSection.appendChild(table)
   let docs = []
   fetchDocuments().then(data => {
@@ -154,7 +154,8 @@ function renderDashboard() {
     if (statusSelect.value) filtered = filtered.filter(d => d.durum === statusSelect.value)
     filtered.forEach(doc => {
       const tr = document.createElement('tr')
-      tr.innerHTML = `<td>${doc.evrakNo}</td><td>${doc.baslik}</td><td>${doc.birim}</td><td>${doc.durum}</td><td>${doc.olusturulmaTarihi}</td><td><button class='btn' data-evrak="${doc.evrakNo}">Detay</button></td><td><button class='btn-delete' data-delete="${doc.evrakNo}">Sil</button></td>`
+      const driveBtn = doc.drive ? `<a href="${doc.drive}" target="_blank" title="Drive Linki">🔗</a>` : '-'
+      tr.innerHTML = `<td>${doc.evrakNo}</td><td>${doc.baslik}</td><td>${doc.birim}</td><td>${doc.durum}</td><td>${doc.olusturulmaTarihi}</td><td>${driveBtn}</td><td><button class='btn' data-evrak="${doc.evrakNo}">Detay</button></td><td><button class='btn' data-edit="${doc.evrakNo}">Düzenle</button></td><td><button class='btn-delete' data-delete="${doc.evrakNo}">Sil</button></td>`
       tbody.appendChild(tr)
     })
   }
@@ -169,6 +170,10 @@ function renderDashboard() {
     if (e.target.classList.contains('btn-delete') && e.target.dataset.delete) {
       deleteDocument(e.target.dataset.delete)
     }
+    if (e.target.classList.contains('btn') && e.target.dataset.edit) {
+      const doc = docs.find(d => d.evrakNo === e.target.dataset.edit)
+      openAddEditModal(doc)
+    }
   }
 }
 
@@ -181,29 +186,32 @@ async function deleteDocument(evrakNo) {
   renderDashboard()
 }
 
-function openAddModal() {
+function openAddEditModal(doc) {
   addModal.innerHTML = ''
+  const isEdit = !!doc
   const modalBox = document.createElement('div')
   modalBox.className = 'modal-content'
   modalBox.innerHTML = `
-    <h3>Yeni Evrak Ekle</h3>
-    <input id="add-evrakNo" placeholder="Evrak No">
-    <input id="add-baslik" placeholder="Başlık">
-    <input id="add-aciklama" placeholder="Açıklama">
-    <input id="add-tarih" type="date" placeholder="Oluşturulma Tarihi">
-    <input id="add-birim" placeholder="Birim">
-    <input id="add-personel" placeholder="İşleyen Personel">
+    <h3>${isEdit ? 'Evrak Düzenle' : 'Yeni Evrak Ekle'}</h3>
+    <input id="add-evrakNo" placeholder="Evrak No" value="${isEdit ? doc.evrakNo : ''}" ${isEdit ? 'readonly' : ''}>
+    <input id="add-baslik" placeholder="Başlık" value="${isEdit ? doc.baslik : ''}">
+    <input id="add-aciklama" placeholder="Açıklama" value="${isEdit ? doc.aciklama || '' : ''}">
+    <input id="add-tarih" type="date" placeholder="Oluşturulma Tarihi" value="${isEdit ? doc.olusturulmaTarihi : ''}">
+    <input id="add-birim" placeholder="Birim" value="${isEdit ? doc.birim : ''}">
+    <input id="add-personel" placeholder="İşleyen Personel" value="${isEdit ? doc.personel : ''}">
     <select id="add-durum">
       <option value="Beklemede">Beklemede</option>
       <option value="İşlemde">İşlemde</option>
       <option value="Tamamlandı">Tamamlandı</option>
       <option value="İptal">İptal</option>
     </select>
+    <input id="add-drive" placeholder="Google Drive Linki (isteğe bağlı)" value="${isEdit ? doc.drive || '' : ''}">
     <button id="add-save" class="btn">Kaydet</button>
     <button id="add-cancel" class="btn">Vazgeç</button>
     <div id="add-error" style="color:#d32f2f;margin-top:1em;"></div>
   `
   addModal.appendChild(modalBox)
+  document.getElementById('add-durum').value = isEdit ? doc.durum : 'Beklemede'
   addModal.classList.add('active')
   document.getElementById('add-cancel').onclick = () => {
     addModal.classList.remove('active')
@@ -216,15 +224,16 @@ function openAddModal() {
     const birim = document.getElementById('add-birim').value.trim()
     const personel = document.getElementById('add-personel').value.trim()
     const durum = document.getElementById('add-durum').value
+    const drive = document.getElementById('add-drive').value.trim()
     if (!evrakNo || !baslik || !olusturulmaTarihi || !birim || !personel) {
       document.getElementById('add-error').textContent = 'Tüm alanlar zorunlu'
       return
     }
+    let gecmis = isEdit && doc.gecmis ? doc.gecmis : [
+      { tarih: olusturulmaTarihi, personel, aciklama: 'Evrak oluşturuldu.' }
+    ]
     const yeniDoc = {
-      evrakNo, baslik, aciklama, olusturulmaTarihi, durum, birim, personel,
-      gecmis: [
-        { tarih: olusturulmaTarihi, personel, aciklama: 'Evrak oluşturuldu.' }
-      ]
+      evrakNo, baslik, aciklama, olusturulmaTarihi, durum, birim, personel, drive: drive || undefined, gecmis
     }
     await fetch(apiBase + '/documents', {
       method: 'POST',
@@ -250,6 +259,7 @@ async function openDetailModal(evrakNo) {
     <div><b>İşleyen Personel:</b> ${doc.personel}</div>
     <div><b>Durum:</b> ${doc.durum}</div>
     <div><b>Oluşturulma Tarihi:</b> ${doc.olusturulmaTarihi}</div>
+    ${doc.drive ? `<div><b>Drive:</b> <a href="${doc.drive}" target="_blank">Dosyayı Aç</a></div>` : ''}
     <h3>İşlem Geçmişi</h3>
     <ul style="padding-left:1.2em;">
       ${doc.gecmis.map(g => `<li>${g.tarih} – ${g.personel} – ${g.aciklama}</li>`).join('')}
