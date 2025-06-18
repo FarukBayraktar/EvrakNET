@@ -6,10 +6,12 @@ export default function handler(req, res) {
     return
   }
   const { email, password } = req.body
-  if (users.find(u => u.email === email)) {
-    res.status(400).json({ message: 'Bu email ile kayıtlı kullanıcı var' })
+  if (!email || !password) {
+    res.status(400).json({ message: 'Email ve şifre zorunlu' })
     return
   }
-  users.push({ email, password })
+  if (!users.find(u => u.email === email)) {
+    users.push({ email, password })
+  }
   res.status(200).json({ message: 'Kayıt başarılı' })
 } 
