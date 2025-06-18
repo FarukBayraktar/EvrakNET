@@ -1,15 +1,12 @@
-import clientPromise from './_db'
+import { documents } from './mock-data'
 
-export default async function handler(req, res) {
+export default function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(405).json({ message: 'Method not allowed' })
     return
   }
   const { evrakNo } = req.query
-  const client = await clientPromise
-  const db = client.db('evraknet')
-  const docs = db.collection('documents')
-  const doc = await docs.findOne({ evrakNo })
+  const doc = documents.find(d => d.evrakNo === evrakNo)
   if (!doc) {
     res.status(404).json({ message: 'Evrak bulunamadı' })
     return
